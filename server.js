@@ -233,7 +233,12 @@ function registrarRequisicao(req, res) {
 
   excluirRequisicoesAntigas.run(webhook.id, webhook.id, LIMITE_REQUISICOES_POR_WEBHOOK);
 
-  const responder = () => res.status(webhook.status_code).json(JSON.parse(webhook.corpo_resposta));
+  console.log(`[${new Date().toLocaleTimeString('pt-BR')}] ${req.method} ${req.originalUrl} recebida`);
+
+  const responder = () => {
+    res.status(webhook.status_code).json(JSON.parse(webhook.corpo_resposta));
+    console.log(`[${new Date().toLocaleTimeString('pt-BR')}] ${req.method} ${req.originalUrl} → ${webhook.status_code} respondida`);
+  };
 
   if (webhook.delay_ms > 0) {
     setTimeout(responder, webhook.delay_ms);
