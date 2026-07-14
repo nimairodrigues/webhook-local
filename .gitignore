@@ -1,0 +1,13 @@
+node_modules/
+
+# Banco de dados SQLite local (dados de teste, nao versionados)
+webhook.db
+webhook.db-shm
+webhook.db-wal
+
+# Logs
+npm-debug.log*
+*.log
+
+# Sistema
+.DS_Store

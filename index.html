@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema Webhook.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>">
+  <title>Webhook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <span class="marca-icone" aria-hidden="true">🔗</span>
+        <span class="marca-nome">Webhook</span>
+      </div>
+
+      <input type="text" id="url-personalizada" placeholder="ID ou path personalizado (opcional)" maxlength="100" aria-label="ID ou path personalizado, ex: loja/pedidos (opcional)">
+      <button type="button" id="btn-nova-url">+ Gerar nova URL</button>
+      <p class="erro" id="erro-nova-url" aria-live="polite"></p>
+
+      <p id="urls-vazio">Nenhuma URL gerada ainda.</p>
+      <ul id="urls-lista"></ul>
+    </aside>
+
+    <main class="conteudo">
+      <div id="conteudo-webhook">
+        <h1>Webhook</h1>
+        <p class="subtitulo">Copie a URL abaixo e envie uma requisicao HTTP de qualquer metodo para ela. As requisicoes recebidas aparecem na lista abaixo.</p>
+
+        <div class="campo-url">
+          <input type="text" id="webhook-url" readonly aria-label="URL do webhook">
+          <button type="button" id="btn-copiar-url">Copiar</button>
+        </div>
+        <p class="sucesso" id="sucesso-copia" aria-live="polite">URL copiada.</p>
+
+        <button type="button" class="btn-secundario" id="btn-abrir-config">⚙️ Configurações</button>
+
+        <div id="requisicoes">
+          <h1>Requisicoes recebidas</h1>
+          <p id="requisicoes-vazio">Nenhuma requisicao recebida ainda.</p>
+          <ul id="requisicoes-lista"></ul>
+        </div>
+      </div>
+
+      <div id="estado-vazio-principal">
+        <h1>Nenhuma URL selecionada</h1>
+        <p class="subtitulo">Gere uma nova URL na barra lateral para começar a receber requisições.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de configuracoes -->
+  <div class="modal-overlay" id="modal-config-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-config-titulo">
+      <div class="modal-cabecalho">
+        <h2 id="modal-config-titulo">Configurações da resposta</h2>
+        <button type="button" class="btn-fechar-modal" id="btn-fechar-config" aria-label="Fechar">✕</button>
+      </div>
+
+      <label for="status-code">Status code de resposta</label>
+      <input type="number" id="status-code" min="100" max="599" value="200" aria-label="Status code de resposta">
+
+      <label for="delay-ms">Delay de resposta (ms)</label>
+      <input type="number" id="delay-ms" min="0" max="30000" step="100" value="0" aria-label="Delay de resposta em milissegundos">
+
+      <div class="campo-response-body-cabecalho">
+        <label for="response-body">Corpo JSON de resposta</label>
+        <button type="button" id="btn-formatar-json">✨ Formatar JSON</button>
+      </div>
+      <textarea id="response-body" rows="8" aria-label="Corpo JSON de resposta">{"ok":true}</textarea>
+
+      <p class="erro" id="erro-config" aria-live="polite"></p>
+      <p class="sucesso" id="sucesso-config" aria-live="polite">Configurações salvas.</p>
+
+      <button type="button" id="btn-salvar-config">Salvar configurações</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

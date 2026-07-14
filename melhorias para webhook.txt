@@ -1,0 +1,93 @@
+MELHORIAS PARA O PROJETO WEBHOOK
+==================================
+
+SEGURANCA / ROBUSTEZ DO BACKEND
+--------------------------------
+1. Sem autenticacao nem rate limiting - qualquer pessoa que descubra ou adivinhe
+   um ID de 12 hex chars (crypto.randomBytes(6)) pode ler o historico de
+   requisicoes de outro usuario via GET /api/webhooks/:id. E um espaco pequeno
+   (2^48), mas ainda assim vale considerar um token de acesso separado do ID
+   da URL publica.
+
+2. "webhooks" cresce indefinidamente em memoria - nao ha expiracao/limpeza de
+   webhooks antigos. Um TTL (ex: apagar webhooks sem atividade ha 24h) evitaria
+   vazamento de memoria em uso prolongado.
+
+3. corpoResposta sem limite de tamanho - da pra configurar um JSON
+   arbitrariamente grande via /response-body; um limite (express.json({ limit:
+   '1mb' })) ja existe implicitamente pelo padrao do Express, mas vale deixar
+   explicito.
+
+4. Sem HTTPS/CORS configurado - ok para uso local, mas se for exposto na rede,
+   faltam headers de seguranca basicos (helmet, CORS restritivo).
+
+5. GET /api/webhooks/:id sem paginacao - a lista inteira (ate 50 itens, cada um
+   podendo ter ate 2MB de corpo) e enviada a cada poll de 3s. Para 50
+   requisicoes grandes isso pode ficar pesado.
+
+FUNCIONALIDADE
+--------------
+6. Nao ha como limpar/deletar um webhook manualmente - so existe "Gerar nova
+   URL", que abandona a URL antiga (ela continua ativa e recebendo dados). Um
+   botao "excluir este webhook" seria util.
+
+7. Sem botao para copiar/baixar o corpo de uma requisicao individual - util
+   para debugging.
+
+8. Sem filtro/busca na lista de requisicoes (por metodo, path, texto no corpo).
+
+9. Delay configuravel na resposta - funcionalidade comum em ferramentas desse
+   tipo (simular latencia), nao existe ainda.
+
+10. Headers de resposta customizaveis - hoje so da pra configurar status code e
+    body; headers custom (ex: simular um redirect ou um header de auth) seria
+    o proximo passo natural dado o que ja foi construido.
+
+11. Sem persistencia entre reinicios do servidor - comentario no codigo ja
+    assume isso ("suficiente para uma ferramenta de teste"), mas se o uso
+    crescer, um SQLite simples resolveria sem muita complexidade.
+
+FRONTEND / UX
+-------------
+12. Polling fixo de 3s sem WebSocket/SSE - funciona, mas gera uma requisicao
+    HTTP completa a cada 3s mesmo sem novidade. Server-Sent Events eliminaria
+    isso e daria atualizacao em tempo real.
+
+13. document.execCommand('copy') (script.js) esta deprecated - hoje so e usado
+    como fallback do Clipboard API, o que e razoavel, mas vale saber que pode
+    ser removido dos navegadores no futuro.
+
+14. Sem loading state ao carregar a lista inicial - se a rede estiver lenta, a
+    tela fica com "Nenhuma requisicao recebida ainda" antes do primeiro poll
+    completar, o que pode confundir.
+
+15. Modal sem foco automatico / focus trap - ao abrir, o foco nao vai para o
+    primeiro campo, e Tab pode escapar do modal. Acessibilidade basica de modal
+    (focus trap + autofocus) ajudaria.
+
+16. erro-config e sucesso-config sempre no DOM mesmo vazios - o texto fixo
+    "Configuracoes salvas." no HTML e um pouco fragil (fica hardcoded fora do
+    JS).
+
+CODIGO / MANUTENIBILIDADE
+--------------------------
+17. server.js e um arquivo unico crescendo - ainda pequeno (100 linhas), mas se
+    continuar recebendo funcionalidades (headers customizados, delay, TTL),
+    vale separar rotas (routes/webhooks.js) do armazenamento (store.js).
+
+18. Nenhum teste automatizado - nao ha testes unitarios/integracao para os
+    endpoints. Dado que ja existem varias regras de validacao (status code,
+    JSON do corpo, 404s), um teste rapido com supertest cobriria regressoes.
+
+19. Sem controle de versao (git) - o diretorio do projeto nao e um repositorio
+    git ainda. Isso e provavelmente o item de maior risco pratico: qualquer
+    mudanca e irreversivel sem backup manual.
+
+PRIORIDADE RECOMENDADA
+-----------------------
+Se tivesse que escolher so 3 para atacar primeiro:
+  a) Inicializar um repositorio git (git init + primeiro commit) - evita
+     perda de trabalho.
+  b) TTL/limpeza de webhooks em memoria.
+  c) Headers de resposta customizaveis - extensao natural do que ja existe
+     (status code + body).
