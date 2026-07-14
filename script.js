@@ -401,9 +401,21 @@ async function excluirWebhook(id) {
   await renderizarListaLateral();
 }
 
-function abrirModalConfig() {
+// Recarrega os valores atuais do webhook do servidor antes de abrir o modal,
+// senao um valor digitado e depois descartado (fechar sem salvar) ficaria
+// preso nos campos na proxima vez que o modal fosse aberto.
+async function abrirModalConfig() {
   esconder(document.getElementById('erro-config'));
   esconder(document.getElementById('sucesso-config'));
+
+  const resposta = await fetch('/api/webhooks/' + encodeURIComponent(webhookId));
+  if (resposta.ok) {
+    const webhook = await resposta.json();
+    document.getElementById('status-code').value = webhook.statusCode;
+    document.getElementById('delay-ms').value = webhook.delayMs || 0;
+    document.getElementById('response-body').value = JSON.stringify(webhook.corpoResposta, null, 2);
+  }
+
   document.getElementById('modal-config-overlay').classList.add('aberto');
 }
 
@@ -503,7 +515,9 @@ document.getElementById('btn-nova-url').addEventListener('click', function() {
   comCarregamento(document.getElementById('btn-nova-url'), gerarWebhook);
 });
 
-document.getElementById('btn-abrir-config').addEventListener('click', abrirModalConfig);
+document.getElementById('btn-abrir-config').addEventListener('click', function() {
+  comCarregamento(document.getElementById('btn-abrir-config'), abrirModalConfig);
+});
 document.getElementById('btn-fechar-config').addEventListener('click', fecharModalConfig);
 document.getElementById('btn-formatar-json').addEventListener('click', formatarJsonDoTextarea);
 
