@@ -229,7 +229,7 @@ function renderizarRequisicoes(requisicoes) {
 
     const pre = document.createElement('pre');
     pre.textContent = JSON.stringify(
-      { query: requisicao.query, headers: requisicao.headers, corpo: parsearCorpoSePossivel(requisicao.corpo) },
+      { query: requisicao.query, headers: requisicao.headers, body: parsearCorpoSePossivel(requisicao.corpo) },
       null,
       2
     );
