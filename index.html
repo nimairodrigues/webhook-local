@@ -6,6 +6,14 @@
   <meta name="description" content="Sistema Webhook.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>">
   <title>Webhook</title>
+  <script>
+    (function() {
+      var tema = localStorage.getItem('webhook-tema');
+      if (tema === 'escuro' || (!tema && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-tema', 'escuro');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,6 +22,7 @@
       <div class="marca">
         <span class="marca-icone" aria-hidden="true">🔗</span>
         <span class="marca-nome">Webhook</span>
+        <button type="button" class="btn-tema" id="btn-alternar-tema" aria-label="Alternar tema"></button>
       </div>
 
       <input type="text" id="url-personalizada" placeholder="ID ou path personalizado (opcional)" maxlength="100" aria-label="ID ou path personalizado, ex: loja/pedidos (opcional)">

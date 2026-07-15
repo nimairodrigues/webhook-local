@@ -1,3 +1,27 @@
+const CHAVE_STORAGE_TEMA = 'webhook-tema';
+
+function aplicarTema(tema) {
+  document.documentElement.setAttribute('data-tema', tema);
+  localStorage.setItem(CHAVE_STORAGE_TEMA, tema);
+
+  const botao = document.getElementById('btn-alternar-tema');
+  if (tema === 'escuro') {
+    botao.textContent = '☀️ Modo claro';
+    botao.setAttribute('aria-label', 'Ativar modo claro');
+  } else {
+    botao.textContent = '🌙 Modo escuro';
+    botao.setAttribute('aria-label', 'Ativar modo escuro');
+  }
+}
+
+function alternarTema() {
+  const temaAtual = document.documentElement.getAttribute('data-tema') === 'escuro' ? 'escuro' : 'claro';
+  aplicarTema(temaAtual === 'escuro' ? 'claro' : 'escuro');
+}
+
+aplicarTema(document.documentElement.getAttribute('data-tema') === 'escuro' ? 'escuro' : 'claro');
+document.getElementById('btn-alternar-tema').addEventListener('click', alternarTema);
+
 function definirVisivel(elementoOuId, visivel) {
   const elemento = typeof elementoOuId === 'string' ? document.getElementById(elementoOuId) : elementoOuId;
   elemento.style.display = visivel ? 'block' : 'none';
