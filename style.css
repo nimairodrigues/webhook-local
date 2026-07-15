@@ -609,9 +609,33 @@ button.carregando::after {
   text-align: left;
 }
 
+.requisicoes-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 #requisicoes h1 {
   font-size: 1.05rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
+}
+
+.btn-excluir-tudo {
+  width: auto;
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--cor-erro);
+  border: 1.5px solid var(--cor-perigo-borda);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+.btn-excluir-tudo:not(:disabled):hover {
+  background: var(--cor-erro-clara);
+  border-color: var(--cor-erro);
+  box-shadow: none;
 }
 
 #requisicoes-vazio {

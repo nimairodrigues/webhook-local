@@ -425,6 +425,16 @@ async function excluirWebhook(id) {
   await renderizarListaLateral();
 }
 
+async function excluirTodasRequisicoes() {
+  if (!webhookId) return;
+
+  const resposta = await fetch('/api/webhooks/' + encodeURIComponent(webhookId) + '/requisicoes', { method: 'DELETE' });
+  if (!resposta.ok && resposta.status !== 404) return;
+
+  ultimaAssinaturaRequisicoes = null;
+  await Promise.all([carregarRequisicoes(), renderizarListaLateral()]);
+}
+
 // Recarrega os valores atuais do webhook do servidor antes de abrir o modal,
 // senao um valor digitado e depois descartado (fechar sem salvar) ficaria
 // preso nos campos na proxima vez que o modal fosse aberto.
@@ -541,6 +551,9 @@ document.getElementById('btn-nova-url').addEventListener('click', function() {
 
 document.getElementById('btn-abrir-config').addEventListener('click', function() {
   comCarregamento(document.getElementById('btn-abrir-config'), abrirModalConfig);
+});
+document.getElementById('btn-excluir-requisicoes').addEventListener('click', function() {
+  comCarregamento(document.getElementById('btn-excluir-requisicoes'), excluirTodasRequisicoes);
 });
 document.getElementById('btn-fechar-config').addEventListener('click', fecharModalConfig);
 document.getElementById('btn-formatar-json').addEventListener('click', formatarJsonDoTextarea);

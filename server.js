@@ -59,6 +59,7 @@ const excluirRequisicoesAntigas = db.prepare(`
     SELECT id FROM requisicoes WHERE webhook_id = ? ORDER BY recebido_em DESC LIMIT ?
   )
 `);
+const excluirRequisicoesDoWebhook = db.prepare('DELETE FROM requisicoes WHERE webhook_id = ?');
 
 const REGEX_SEGMENTO_ID = /^[a-zA-Z0-9_-]+$/;
 
@@ -152,6 +153,16 @@ app.delete('/api/webhooks/:id', (req, res) => {
   if (resultado.changes === 0) {
     return res.status(404).json({ erro: 'Webhook nao encontrado.' });
   }
+  res.status(204).end();
+});
+
+app.delete('/api/webhooks/:id/requisicoes', (req, res) => {
+  const webhook = buscarWebhook.get(req.params.id);
+  if (!webhook) {
+    return res.status(404).json({ erro: 'Webhook nao encontrado.' });
+  }
+
+  excluirRequisicoesDoWebhook.run(req.params.id);
   res.status(204).end();
 });
 
