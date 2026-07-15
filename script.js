@@ -268,6 +268,24 @@ function renderizarRequisicoes(requisicoes) {
 }
 
 const CHAVE_STORAGE_WEBHOOK_ATUAL = 'webhook-atual-id';
+const CHAVE_STORAGE_CONTAGEM_VISTA = 'webhook-contagem-vista';
+
+// Guarda, por webhook, quantas requisicoes o usuario ja viu — para acender a
+// bolinha de "nova requisicao" na barra lateral apenas quando a contagem do
+// servidor ultrapassar esse valor. Persistido para sobreviver a reload.
+function carregarContagemVista() {
+  try {
+    return JSON.parse(localStorage.getItem(CHAVE_STORAGE_CONTAGEM_VISTA)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function marcarRequisicoesComoVistas(id, total) {
+  const contagem = carregarContagemVista();
+  contagem[id] = total;
+  localStorage.setItem(CHAVE_STORAGE_CONTAGEM_VISTA, JSON.stringify(contagem));
+}
 
 function mostrarConteudoWebhook() {
   document.getElementById('estado-vazio-principal').style.display = 'none';
@@ -296,6 +314,7 @@ function aplicarWebhookNaTela(webhook) {
   document.getElementById('requisicoes-lista').innerHTML = '';
   definirVisivel('requisicoes-vazio', true);
   ultimaAssinaturaRequisicoes = null;
+  marcarRequisicoesComoVistas(webhook.id, (webhook.requisicoes || []).length);
 
   iniciarPolling();
 }
@@ -362,12 +381,25 @@ async function renderizarListaLateral() {
     definirVisivel(vazio, webhooks.length === 0);
     lista.innerHTML = '';
 
+    const contagemVista = carregarContagemVista();
+
     webhooks.forEach((webhook) => {
       const item = document.createElement('li');
       item.setAttribute('data-testid', `url-${webhook.id}`);
       item.tabIndex = 0;
       item.setAttribute('role', 'button');
       if (webhook.id === webhookId) item.classList.add('ativo');
+
+      // O webhook aberto no momento e considerado "visto" a cada ciclo, para
+      // a bolinha nao acender nele enquanto o usuario ja esta olhando: so
+      // deve aparecer nos outros itens da lista quando chega requisicao nova.
+      const visto = contagemVista[webhook.id];
+      const temRequisicaoNova = webhook.id !== webhookId
+        && visto !== undefined
+        && webhook.totalRequisicoes > visto;
+      if (visto === undefined || webhook.id === webhookId) {
+        contagemVista[webhook.id] = webhook.totalRequisicoes;
+      }
 
       const info = document.createElement('div');
       info.className = 'urls-lista-info';
@@ -405,9 +437,21 @@ async function renderizarListaLateral() {
       });
 
       item.appendChild(info);
+
+      if (temRequisicaoNova) {
+        const bolinha = document.createElement('span');
+        bolinha.className = 'bolinha-nova';
+        bolinha.setAttribute('role', 'status');
+        bolinha.setAttribute('aria-label', 'Nova requisição recebida');
+        bolinha.title = 'Nova requisição recebida';
+        item.appendChild(bolinha);
+      }
+
       item.appendChild(btnExcluir);
       lista.appendChild(item);
     });
+
+    localStorage.setItem(CHAVE_STORAGE_CONTAGEM_VISTA, JSON.stringify(contagemVista));
   } catch (e) {
     // Lista best-effort; falha de rede nao deve travar a tela.
   }

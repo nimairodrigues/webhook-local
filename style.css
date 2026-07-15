@@ -555,6 +555,14 @@ button.carregando::after {
   outline-offset: 1px;
 }
 
+.bolinha-nova {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--cor-primaria);
+}
+
 .urls-lista-info {
   display: flex;
   flex-direction: column;
