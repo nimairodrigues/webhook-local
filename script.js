@@ -406,7 +406,7 @@ async function renderizarListaLateral() {
 
       const url = document.createElement('span');
       url.className = 'urls-lista-url';
-      url.textContent = webhook.url.replace(/^https?:\/\//, '');
+      url.textContent = webhook.url.replace(/^https?:\/\/[^/]+/, '');
 
       const meta = document.createElement('span');
       meta.className = 'urls-lista-meta';
