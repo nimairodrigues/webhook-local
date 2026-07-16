@@ -602,8 +602,15 @@ document.getElementById('btn-excluir-requisicoes').addEventListener('click', fun
 document.getElementById('btn-fechar-config').addEventListener('click', fecharModalConfig);
 document.getElementById('btn-formatar-json').addEventListener('click', formatarJsonDoTextarea);
 
+let mousedownNoOverlay = false;
+
+document.getElementById('modal-config-overlay').addEventListener('mousedown', function(evento) {
+  mousedownNoOverlay = evento.target === evento.currentTarget;
+});
+
 document.getElementById('modal-config-overlay').addEventListener('click', function(evento) {
-  if (evento.target === evento.currentTarget) fecharModalConfig();
+  if (mousedownNoOverlay && evento.target === evento.currentTarget) fecharModalConfig();
+  mousedownNoOverlay = false;
 });
 
 document.addEventListener('keydown', function(evento) {
